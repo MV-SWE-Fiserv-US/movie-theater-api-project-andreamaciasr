@@ -2,7 +2,7 @@
 const express = require('express');
 const showsRouter = express.Router();
 const { Show, User } = require('../models/index');
-
+const { check, validationResult } = require('express-validator');
 
 showsRouter.use(express.json());
 showsRouter.use(express.urlencoded());
@@ -75,6 +75,22 @@ showsRouter.get("/genre/:genre", async (req, res) => {
     }
 });
 
+// server side validation for creating a new show
+showsRouter.post('/addShow', [
+    check('title').isLength({ max: 25 }).withMessage('Title must be a maximum of 25 characters')
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+        const newShow = await Show.create(req.body);
+        res.json(newShow);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 module.exports = showsRouter;
 
