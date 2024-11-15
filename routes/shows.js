@@ -2,7 +2,7 @@
 const express = require('express');
 const showsRouter = express.Router();
 const { Show, User } = require('../models/index');
-const { check, validationResult } = require("express-validator");
+
 
 showsRouter.use(express.json());
 showsRouter.use(express.urlencoded());
@@ -47,6 +47,33 @@ showsRouter.put('/:showId/available', async (req, res) => {
     }
 })
 
+showsRouter.delete('/:id', async (req, res) => {
+    try {
+        const deletedShow = await Show.destroy({where: {id: req.params.id}})
+        res.json({ message: `Deleted show with ID ${req.params.id}`, deletedShow });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+showsRouter.get("/genre/:genre", async (req, res) => {
+    try {
+        let genre = req.params.genre;
+        let char = genre[0].toUpperCase();
+        genre = char + genre.slice(1);
+         
+        console.log(`Searching for movies with genre: ${genre}`);
+ 
+        const movies = await Show.findAll({ where: { genre } });
+        if (movies.length > 0) {
+            res.json(movies);
+        } else {
+            res.status(404).json({ message: "No movies found for this genre" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 
 module.exports = showsRouter;
