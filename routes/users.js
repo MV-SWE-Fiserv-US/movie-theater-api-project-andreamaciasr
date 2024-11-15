@@ -1,8 +1,7 @@
 const express = require('express');
 const usersRouter = express.Router();
 const { User, Show }   = require('../models/index');
-const { check, validationResult } = require("express-validator");
-const { where } = require('sequelize');
+
 
 usersRouter.use(express.json());
 usersRouter.use(express.urlencoded());
@@ -25,13 +24,6 @@ usersRouter.get('/:id/shows', async (req, res) => {
 });
 
 
-// usersRouter.put('/:userId/shows/:showId', async (req, res) => {
-//     const user = await User.findByPk(req.params.id, { include: [Show]});
-//     const show = await Show.findByPk(req.params.id);
-//     await user.addShow(show);
-//     res.json({ message: "Show added to user" });
-// });
-
 usersRouter.put('/:userId/shows/:showId', async (req, res) => {
     try {
         const user = await User.findByPk(req.params.userId, { include: [Show] });
@@ -47,6 +39,8 @@ usersRouter.put('/:userId/shows/:showId', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+
 
 
 module.exports = usersRouter;
